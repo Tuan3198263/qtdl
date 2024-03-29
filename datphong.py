@@ -1,4 +1,4 @@
-from connection import*   
+from connection import conn
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QDateEdit, QTableWidget, QTableWidgetItem, QSplitter, QMessageBox, QFormLayout
 from PyQt5.QtCore import Qt, QDate
@@ -101,10 +101,11 @@ class ThuePhongWindow(QMainWindow):
         # Hiển thị dữ liệu ban đầu
         self.display_database()
 
-
+#-----------------------------------------------------------------------------------------------------------
+#
     def display_database(self):
         try:
-            conn = connect_to_database()
+            #conn = connect_to_database()
             cursor = conn.cursor()
 
             # Lấy dữ liệu từ cơ sở dữ liệu
@@ -117,7 +118,7 @@ class ThuePhongWindow(QMainWindow):
                     self.table_widget.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
             cursor.close()
-            conn.close()
+            #conn.close()
         except Exception as e:
             print("Error:", e)
 
@@ -134,7 +135,7 @@ class ThuePhongWindow(QMainWindow):
             return
 
         try:
-            conn = connect_to_database()
+            #conn = connect_to_database()
             cursor = conn.cursor()
 
             # Gọi thủ tục DatPhong
@@ -145,7 +146,7 @@ class ThuePhongWindow(QMainWindow):
             self.clear_fields()
 
             cursor.close()
-            conn.close()
+            #conn.close()
 
             # Sau khi đặt phòng thành công, hiển thị lại
             self.display_database()

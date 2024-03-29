@@ -1,4 +1,4 @@
-from connection import*   # Import kết nối đến cơ sở dữ liệu
+from connection import conn   # Import kết nối đến cơ sở dữ liệu
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QDateEdit, QTableWidget, QTableWidgetItem, QSplitter, QMessageBox, QFormLayout,QComboBox
 from PyQt5.QtCore import Qt, QDate
@@ -19,6 +19,14 @@ class ThuePhongWindow(QMainWindow):
         input_widget = QWidget()
         input_layout = QFormLayout(input_widget)
         input_layout.setVerticalSpacing(20)
+        
+        home_button = QPushButton("Home", self)
+        home_button.setFixedHeight(40)
+        home_button.setFixedWidth(60)
+        home_button.setCursor(Qt.PointingHandCursor)  
+        
+        #home_button.clicked.connect(self.go_to_main_window)
+        input_layout.addWidget(home_button)
 
         label = QLabel("Điền thông tin yêu cầu dịch vụ", self)
         label.setAlignment(Qt.AlignCenter)
@@ -107,10 +115,11 @@ class ThuePhongWindow(QMainWindow):
         # Hiển thị dữ liệu ban đầu
         self.display_database()
 
-
+#-------------------------------------------------------------------------------------------------------
+#Func
     def display_database(self):
         try:
-            conn = connect_to_database()
+            #conn = connect_to_database()
             cursor = conn.cursor()
 
             # Lấy dữ liệu từ cơ sở dữ liệu
@@ -123,7 +132,7 @@ class ThuePhongWindow(QMainWindow):
                     self.table_widget.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
             cursor.close()
-            conn.close()
+            #conn.close()
         except Exception as e:
             print("Error:", e)
     
@@ -132,7 +141,7 @@ class ThuePhongWindow(QMainWindow):
     
     def fill_combo_box(self, combo_box):
           try:
-              conn = connect_to_database()
+              #conn = connect_to_database()
               cursor = conn.cursor()
 
               # Lấy dữ liệu từ cơ sở dữ liệu
@@ -143,7 +152,7 @@ class ThuePhongWindow(QMainWindow):
                   combo_box.addItem(f"{ma_dich_vu} - {ten_dich_vu}")
 
               cursor.close()
-              conn.close()
+              #conn.close()
           except Exception as e:
               print("Error:", e)
 
@@ -161,7 +170,7 @@ class ThuePhongWindow(QMainWindow):
             return
 
         try:
-            conn = connect_to_database()
+            #conn = connect_to_database()
             cursor = conn.cursor()
             # Gọi thủ tục DatPhong
             cursor.callproc("YeuCauDichVu", ( ma_thue, ma_dich_vu, ngay_su_dung, don_gia))
@@ -172,7 +181,7 @@ class ThuePhongWindow(QMainWindow):
             self.clear_fields()
 
             cursor.close()
-            conn.close()
+            #conn.close()
 
             # Sau khi đặt phòng thành công, hiển thị lại
             self.display_database()
@@ -188,7 +197,7 @@ class ThuePhongWindow(QMainWindow):
         ma_thue = self.inputs[0].text()
         ma_dich_vu = self.inputs[1].currentText().split(" - ")[0]  # Lấy mã dịch vụ từ ComboBox
         try:
-            conn = connect_to_database()
+            #conn = connect_to_database()
             cursor = conn.cursor()
 
             # Gọi thủ tục HuyDichVu với tham số maSD
@@ -201,7 +210,7 @@ class ThuePhongWindow(QMainWindow):
             self.clear_fields()
 
             cursor.close()
-            conn.close()
+            #conn.close()
 
             # Sau khi đặt phòng thành công, hiển thị lại
             self.display_database()

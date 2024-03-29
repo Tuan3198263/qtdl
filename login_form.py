@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-from connection import*
+from connection import conn
 
 
 class Ui_Form(object): 
@@ -140,7 +140,8 @@ class Ui_Form(object):
                 self.label_4.setText(_translate("Form", "Đăng Nhập"))
 
        
-
+#---------------------------------------------------------------------------------------------------
+#
         def login(self):
                 username = self.username.text()
                 password = self.password.text()
@@ -151,7 +152,7 @@ class Ui_Form(object):
 
 
 def check_login(username, password):
-        conn = connect_to_database()
+        #conn = connect_to_database()
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM NhanVien WHERE SoDienThoai=%s AND Pass=%s", (username, password))
@@ -163,7 +164,7 @@ def check_login(username, password):
                 khachhang = cursor.fetchone()
         
         cursor.close()
-        conn.close()
+        #conn.close()
 
         if employee or khachhang:
                 return True

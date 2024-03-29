@@ -13,13 +13,13 @@
 
 import mysql.connector
 
-def connect_to_database():
+#def connect_to_database():
     # Kết nối đến cơ sở dữ liệu
-    conn = mysql.connector.connect(
+conn = mysql.connector.connect(
         host="sql.freedb.tech",
         user="freedb_qtdl123",
         password="$NFCygvs#bpwT3R",
         database="freedb_quantridulieu"
     )
-    return conn
+    #return conn
 
