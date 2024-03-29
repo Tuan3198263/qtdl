@@ -1,7 +1,5 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QWidget
-from form_login import show_login_window
-from form_datphong import show_booking_window
 from datphong import*
 
 class MainWindow(QMainWindow):
@@ -47,8 +45,6 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-    def show_login(self):
-        show_login_window()
 
     def show_thue_phong(self):
         self.thue_phong_window = ThuePhongWindow()

@@ -1,12 +1,12 @@
-from connection import*   
+from connection import*   # Import kết nối đến cơ sở dữ liệu
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QDateEdit, QTableWidget, QTableWidgetItem, QSplitter, QMessageBox, QFormLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QDateEdit, QTableWidget, QTableWidgetItem, QSplitter, QMessageBox, QFormLayout,QComboBox
 from PyQt5.QtCore import Qt, QDate
 
 class ThuePhongWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Đặt Phòng")
+        self.setWindowTitle("Sử Dụng Dịch Vụ")
         self.resize(1080, 720)
 
         # Tạo layout chính
@@ -15,39 +15,38 @@ class ThuePhongWindow(QMainWindow):
         # Tạo splitter để chia layout thành hai phần
         splitter = QSplitter(Qt.Horizontal)
 
-
-       # Phần nhập thông tin
+        # Phần nhập thông tin
         input_widget = QWidget()
         input_layout = QFormLayout(input_widget)
-        input_layout.setVerticalSpacing(20) 
-        
-        home_button = QPushButton("Home", self)
-        home_button.setFixedHeight(40)
-        home_button.setFixedWidth(60)
-        home_button.setCursor(Qt.PointingHandCursor)  
-        
-        #home_button.clicked.connect(self.go_to_main_window)
-        input_layout.addWidget(home_button)
+        input_layout.setVerticalSpacing(20)
 
-        label = QLabel("Điền thông tin đặt phòng", self)
+        label = QLabel("Điền thông tin yêu cầu dịch vụ", self)
         label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet("font-size: 24px; color: #333;")
         input_layout.addWidget(label)
 
-        labels = ["Mã khách hàng", "Mã phòng", "Ngày vào", "Ngày ra", "Đặt cọc"]
+        labels = ["Mã Thuê", "Dịch Vụ", "Ngày Sử Dụng", "Đơn Giá"]
         self.inputs = []
 
         for label_text in labels:
             label = QLabel(label_text, self)
             label.setStyleSheet("font-size: 18px; color: #666;")
             input_layout.addWidget(label)
-            if label_text in ["Ngày vào", "Ngày ra"]:
+            if label_text == "Ngày Sử Dụng":
                 date_edit = QDateEdit(self)
-                date_edit.setCalendarPopup(True)  
+                date_edit.setCalendarPopup(True)
                 date_edit.setDate(QDate.currentDate())  # Đặt ngày mặc định là ngày hiện tại
                 input_layout.addWidget(date_edit)
                 self.inputs.append(date_edit)
                 date_edit.setFixedHeight(35)
+                
+            elif label_text == "Dịch Vụ":
+                combo_box = QComboBox(self)
+                # Lấy dữ liệu từ cơ sở dữ liệu cho ComboBox
+                self.fill_combo_box(combo_box)
+                combo_box.setFixedHeight(35)
+                input_layout.addWidget(combo_box)
+                self.inputs.append(combo_box)
             else:
                 line_edit = QLineEdit(self)
                 line_edit.setPlaceholderText(f"Nhập {label_text.lower()}")
@@ -55,28 +54,34 @@ class ThuePhongWindow(QMainWindow):
                 input_layout.addWidget(line_edit)
                 self.inputs.append(line_edit)
 
-
-
-        thue_button = QPushButton("Xác nhận", self)
+        thue_button = QPushButton("Yêu Cầu", self)
         thue_button.setStyleSheet("font-size: 16px; padding: 7px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; max-width:200px")
-        thue_button.setCursor(Qt.PointingHandCursor)  
+        thue_button.setCursor(Qt.PointingHandCursor)
         thue_button.setMinimumWidth(thue_button.sizeHint().width())
-        thue_button.clicked.connect(self.thue_phong)
+        thue_button.clicked.connect(self.su_dung_dich_vu)
         input_layout.addWidget(thue_button)
+        splitter.addWidget(input_widget)
+        
+        huy_button = QPushButton("Hủy Yêu Cầu", self)
+        huy_button.setStyleSheet("font-size: 16px; padding: 7px 10px; background-color: #FF0000; color: white; border: none; border-radius: 5px; max-width:200px")
+        huy_button.setCursor(Qt.PointingHandCursor)
+        huy_button.setMinimumWidth(thue_button.sizeHint().width())
+        huy_button.clicked.connect(self.huy_dich_vu)
+        input_layout.addWidget(huy_button)
         splitter.addWidget(input_widget)
 
         # Phần hiển thị cơ sở dữ liệu dưới dạng bảng
         db_display_widget = QWidget()
         db_display_layout = QVBoxLayout(db_display_widget)
 
-        db_label = QLabel("Dữ liệu Thuê Phòng", self)
+        db_label = QLabel("Thông Tin Sử Dụng Dịch Vụ", self)
         db_label.setAlignment(Qt.AlignCenter)
         db_label.setStyleSheet("font-size: 18px; color: #333;")
         db_display_layout.addWidget(db_label)
 
         self.table_widget = QTableWidget(self)
         self.table_widget.setColumnCount(6)  # Số lượng cột
-        self.table_widget.setHorizontalHeaderLabels(["Mã Thuê", "Mã Khách", "Mã Phòng", "Ngày Vào", "Ngày Ra", "Đặt Cọc"])
+        self.table_widget.setHorizontalHeaderLabels(["Mã Sử Dụng","Mã Thuê", "Mã Dịch Vụ", "Tên Dịch Vụ", "Ngày Sử Dụng", "Đơn Giá"])
         db_display_layout.addWidget(self.table_widget)
 
         splitter.addWidget(db_display_widget)
@@ -88,6 +93,7 @@ class ThuePhongWindow(QMainWindow):
         db_width = splitter_width - input_width
         splitter.setSizes([input_width, db_width])
 
+        
         # Thêm splitter vào layout chính
         main_layout.addWidget(splitter)
 
@@ -108,7 +114,7 @@ class ThuePhongWindow(QMainWindow):
             cursor = conn.cursor()
 
             # Lấy dữ liệu từ cơ sở dữ liệu
-            cursor.execute("SELECT * FROM ThuePhong")
+            cursor.execute("SELECT sd.masd, sd.mathue, sd.madichvu, dv.tendichvu, sd.ngaysudung, sd.dongia FROM SuDungDichVu sd JOIN DichVu dv ON sd.madichvu = dv.madichvu;")
             records = cursor.fetchall()
             self.table_widget.setRowCount(0)  # Xóa dữ liệu cũ
             for row_number, row_data in enumerate(records):
@@ -120,28 +126,49 @@ class ThuePhongWindow(QMainWindow):
             conn.close()
         except Exception as e:
             print("Error:", e)
+    
 
-    def thue_phong(self):
-        # Lấy thông tin từ các ô nhập liệu và QDateEdit
-        ma_khach = self.inputs[0].text()
-        ma_phong = self.inputs[1].text()
-        ngay_vao = self.inputs[2].date().toString("yyyy-MM-dd")  # Lấy ngày từ QDateEdit và chuyển đổi thành chuỗi
-        ngay_ra = self.inputs[3].date().toString("yyyy-MM-dd")   # Lấy ngày từ QDateEdit và chuyển đổi thành chuỗi
-        dat_coc = self.inputs[4].text()
 
-        if not (ma_khach and ma_phong and ngay_vao and ngay_ra and dat_coc):
+    
+    def fill_combo_box(self, combo_box):
+          try:
+              conn = connect_to_database()
+              cursor = conn.cursor()
+
+              # Lấy dữ liệu từ cơ sở dữ liệu
+              cursor.execute("SELECT MaDichVu, TenDichVu FROM DichVu")
+              records = cursor.fetchall()
+              for record in records:
+                  ma_dich_vu, ten_dich_vu = record
+                  combo_box.addItem(f"{ma_dich_vu} - {ten_dich_vu}")
+
+              cursor.close()
+              conn.close()
+          except Exception as e:
+              print("Error:", e)
+
+    # Hàm xử lý khi nhấn nút Xác Nhận
+    def su_dung_dich_vu(self):
+        # Lấy thông tin từ các ô nhập liệu
+        ma_thue = self.inputs[0].text()
+        ma_dich_vu = self.inputs[1].currentText().split(" - ")[0]  # Lấy mã dịch vụ từ ComboBox
+        ngay_su_dung = self.inputs[2].date().toString("yyyy-MM-dd")
+        don_gia = self.inputs[3].text()
+
+        # Kiểm tra thông tin đã nhập đủ chưa
+        if not (ma_thue and ma_dich_vu  and ngay_su_dung and don_gia):
             QMessageBox.warning(self, "Lỗi", "Vui lòng nhập đầy đủ thông tin.")
             return
 
         try:
             conn = connect_to_database()
             cursor = conn.cursor()
-
             # Gọi thủ tục DatPhong
-            cursor.callproc("DatPhong", (ma_khach, ma_phong, ngay_vao, ngay_ra, dat_coc))
+            cursor.callproc("YeuCauDichVu", ( ma_thue, ma_dich_vu, ngay_su_dung, don_gia))
             conn.commit()
+      
 
-            QMessageBox.information(self, "Thông báo", "Đặt phòng thành công.")
+            QMessageBox.information(self, "Thông báo", "Đặt Dịch Vụ thành công.")
             self.clear_fields()
 
             cursor.close()
@@ -151,7 +178,38 @@ class ThuePhongWindow(QMainWindow):
             self.display_database()
         except Exception as e:
             QMessageBox.warning(self, "Lỗi", f"Lỗi khi đặt phòng: {e}")
-        
+
+
+
+                
+    
+    # Hủy dịch vụ
+    def huy_dich_vu(self):
+        ma_thue = self.inputs[0].text()
+        ma_dich_vu = self.inputs[1].currentText().split(" - ")[0]  # Lấy mã dịch vụ từ ComboBox
+        try:
+            conn = connect_to_database()
+            cursor = conn.cursor()
+
+            # Gọi thủ tục HuyDichVu với tham số maSD
+            cursor.callproc("HuyDichVu", (ma_thue,ma_dich_vu))
+
+            # Commit các thay đổi
+            conn.commit()
+
+            QMessageBox.information(self,"Thông Báo", "Hủy Dịch Vụ Thành Công")
+            self.clear_fields()
+
+            cursor.close()
+            conn.close()
+
+            # Sau khi đặt phòng thành công, hiển thị lại
+            self.display_database()
+        except Exception as e:
+            print("Lỗi:", e)
+
+
+      # Phương thức để xóa nội dung của các ô nhập liệu sau khi xác nhận
     def clear_fields(self):
         for widget in self.inputs:
             if isinstance(widget, QLineEdit):

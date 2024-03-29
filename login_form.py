@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-from conc import*
+from connection import*
 
 
 class Ui_Form(object): 
@@ -97,12 +97,12 @@ class Ui_Form(object):
                 self.label_2.setGeometry(QtCore.QRect(22, 155, 47, 41))
                 self.label_2.setStyleSheet("")
                 self.label_2.setText("")
-                self.label_2.setPixmap(QtGui.QPixmap("C:/Users/ADMIN/Downloads/Picture2.png"))
+                self.label_2.setPixmap(QtGui.QPixmap("img/picture2"))
                 self.label_2.setObjectName("label_2")
                 self.label_3 = QtWidgets.QLabel(self.widget)
                 self.label_3.setGeometry(QtCore.QRect(22, 265, 47, 41))
                 self.label_3.setText("")
-                self.label_3.setPixmap(QtGui.QPixmap("C:/Users/ADMIN/Downloads/Picture3.png"))
+                self.label_3.setPixmap(QtGui.QPixmap("img/picture3"))
                 self.label_3.setObjectName("label_3")
                 self.label_4 = QtWidgets.QLabel(self.widget)
                 self.label_4.setGeometry(QtCore.QRect(10, 10, 380, 90))
